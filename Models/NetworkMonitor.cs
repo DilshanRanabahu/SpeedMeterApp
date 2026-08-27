@@ -1,14 +1,13 @@
 using System.Linq;
 using System.Net.NetworkInformation;
 
-namespace SpeedMeterApp;
+namespace SpeedMeterApp.Models;
 
 public class NetworkMonitor
 {
     public NetworkMonitor()
     {
     }
-
 
     public (long BytesReceived, long BytesSent) GetTotalNetworkTraffic()
     {
@@ -30,7 +29,7 @@ public class NetworkMonitor
             }
             catch
             {
-
+                  
             }
         }
 

@@ -1,21 +1,27 @@
-<Window x:Class="SpeedMeterApp.MainWindow"
+<Window x:Class="SpeedMeterApp.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:SpeedMeterApp"
         Title="SpeedMeterApp" Height="65" Width="145"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
-        Topmost="True"
-        ShowInTaskbar="False"
-        ResizeMode="NoResize"
+        WindowStyle="None" ShowInTaskbar="False" ResizeMode="NoResize"
+        AllowsTransparency="True" Topmost="True" Background="Transparent"
         Loaded="Window_Loaded">
-    
-    <Window.DataContext>
-        <local:MainViewModel />
-    </Window.DataContext>
 
     <Border Background="#B3000000" CornerRadius="8" Padding="10,5">
+        <Border.ContextMenu>
+            <ContextMenu Background="#1E1E1E" Foreground="White" BorderBrush="#333333">
+                <MenuItem Header="Show Graph" Click="ShowGraph_Click" Background="#1E1E1E" Foreground="White">
+                    <MenuItem.Icon>
+                        <Canvas Width="16" Height="16">
+                            <!-- Axes -->
+                            <Path Data="M2,2 V14 H14" Stroke="#888888" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                            <!-- Chart Line -->
+                            <Path Data="M3,10 L7,5 L10,7 L14,2" Stroke="#4CAF50" StrokeThickness="1.5" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        </Canvas>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+        </Border.ContextMenu>
         <StackPanel VerticalAlignment="Center">
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">

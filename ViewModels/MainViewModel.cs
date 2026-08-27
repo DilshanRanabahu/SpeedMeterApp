@@ -1,17 +1,13 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Threading;
+using SpeedMeterApp.Services;
 
-namespace SpeedMeterApp;
+namespace SpeedMeterApp.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {
-    private readonly NetworkMonitor _networkMonitor;
-    private readonly DispatcherTimer _timer;
-    
-    private long _lastBytesReceived = 0;
-    private long _lastBytesSent = 0;
+    private readonly NetworkDataService _dataService;
 
     private string _downloadSpeed = "0.00";
     private string _uploadSpeed = "0.00";
@@ -42,30 +38,14 @@ public class MainViewModel : INotifyPropertyChanged
         set { if (_uploadUnit != value) { _uploadUnit = value; OnPropertyChanged(); } }
     }
 
-    public MainViewModel()
+    public MainViewModel(NetworkDataService dataService)
     {
-        _networkMonitor = new NetworkMonitor();
-        
-        var initialTraffic = _networkMonitor.GetTotalNetworkTraffic();
-        _lastBytesReceived = initialTraffic.BytesReceived;
-        _lastBytesSent = initialTraffic.BytesSent;
-
-        _timer = new DispatcherTimer();
-        _timer.Interval = TimeSpan.FromSeconds(1);
-        _timer.Tick += Timer_Tick;
-        _timer.Start();
+        _dataService = dataService;
+        _dataService.TrafficUpdated += OnTrafficUpdated;
     }
 
-    private void Timer_Tick(object? sender, EventArgs e)
+    private void OnTrafficUpdated(long receivedDelta, long sentDelta)
     {
-        var currentTraffic = _networkMonitor.GetTotalNetworkTraffic();
-
-        long receivedDelta = currentTraffic.BytesReceived - _lastBytesReceived;
-        long sentDelta = currentTraffic.BytesSent - _lastBytesSent;
-
-        if (receivedDelta < 0) receivedDelta = 0;
-        if (sentDelta < 0) sentDelta = 0;
-
         FormatSpeed(receivedDelta, out string downSpeed, out string downUnit);
         FormatSpeed(sentDelta, out string upSpeed, out string upUnit);
 
@@ -73,9 +53,6 @@ public class MainViewModel : INotifyPropertyChanged
         DownloadUnit = downUnit;
         UploadSpeed = upSpeed;
         UploadUnit = upUnit;
-
-        _lastBytesReceived = currentTraffic.BytesReceived;
-        _lastBytesSent = currentTraffic.BytesSent;
     }
 
     private void FormatSpeed(long bytesPerSecond, out string speed, out string unit)
