@@ -1,7 +1,10 @@
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
+using System;
+using System.Collections.Generic;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media;
 using SpeedMeterApp.ViewModels;
 
 namespace SpeedMeterApp.Views;
@@ -13,12 +16,13 @@ public partial class GraphWindow : Window
     public GraphWindow()
     {
         InitializeComponent();
-        this.DataContextChanged += GraphWindow_DataContextChanged;
         this.Closed += GraphWindow_Closed;
     }
 
-    private void GraphWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    protected override void OnDataContextChanged(EventArgs e)
     {
+        base.OnDataContextChanged(e);
+
         if (_viewModel != null)
         {
             _viewModel.GraphUpdated -= DrawGraph;
@@ -32,7 +36,7 @@ public partial class GraphWindow : Window
         }
     }
 
-    private void GraphWindow_Closed(object? sender, System.EventArgs e)
+    private void GraphWindow_Closed(object? sender, EventArgs e)
     {
         if (_viewModel != null)
         {
@@ -40,33 +44,30 @@ public partial class GraphWindow : Window
         }
     }
 
-    private void GraphCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+    private void GraphCanvas_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
         double h = e.NewSize.Height;
         double w = e.NewSize.Width;
         
-        GridLine75.Y1 = h * 0.25;
-        GridLine75.Y2 = h * 0.25;
-        GridLine75.X2 = w;
+        GridLine75.StartPoint = new Point(0, h * 0.25);
+        GridLine75.EndPoint = new Point(w, h * 0.25);
 
-        GridLine50.Y1 = h * 0.50;
-        GridLine50.Y2 = h * 0.50;
-        GridLine50.X2 = w;
+        GridLine50.StartPoint = new Point(0, h * 0.50);
+        GridLine50.EndPoint = new Point(w, h * 0.50);
 
-        GridLine25.Y1 = h * 0.75;
-        GridLine25.Y2 = h * 0.75;
-        GridLine25.X2 = w;
+        GridLine25.StartPoint = new Point(0, h * 0.75);
+        GridLine25.EndPoint = new Point(w, h * 0.75);
         
         DrawGraph();
     }
 
     private void DrawGraph()
     {
-        if (_viewModel == null || GraphCanvas.ActualWidth == 0 || GraphCanvas.ActualHeight == 0)
+        if (_viewModel == null || GraphCanvas.Bounds.Width == 0 || GraphCanvas.Bounds.Height == 0)
             return;
 
-        double width = GraphCanvas.ActualWidth;
-        double height = GraphCanvas.ActualHeight;
+        double width = GraphCanvas.Bounds.Width;
+        double height = GraphCanvas.Bounds.Height;
         double maxSpeed = _viewModel.MaxSpeedValue;
 
         if (maxSpeed <= 0) maxSpeed = 1;
@@ -74,8 +75,8 @@ public partial class GraphWindow : Window
         // X-axis step (60 seconds history)
         double xStep = width / 59.0;
 
-        var downloadPoints = new PointCollection();
-        var uploadPoints = new PointCollection();
+        var downloadPoints = new List<Point>();
+        var uploadPoints = new List<Point>();
 
         var downHistory = _viewModel.DownloadHistory;
         var upHistory = _viewModel.UploadHistory;
@@ -104,32 +105,29 @@ public partial class GraphWindow : Window
         DownloadLine.Points = downloadPoints;
         UploadLine.Points = uploadPoints;
 
-        CurrentDownloadLine.X1 = 0;
-        CurrentDownloadLine.Y1 = lastDownY;
-        CurrentDownloadLine.X2 = width;
-        CurrentDownloadLine.Y2 = lastDownY;
+        CurrentDownloadLine.StartPoint = new Point(0, lastDownY);
+        CurrentDownloadLine.EndPoint = new Point(width, lastDownY);
 
         CurrentDownloadText.Text = _viewModel.CurrentDownloadText;
         Canvas.SetTop(CurrentDownloadText, lastDownY - 16);
         Canvas.SetLeft(CurrentDownloadText, (width / 2) - 25);
 
-        CurrentUploadLine.X1 = 0;
-        CurrentUploadLine.Y1 = lastUpY;
-        CurrentUploadLine.X2 = width;
-        CurrentUploadLine.Y2 = lastUpY;
+        CurrentUploadLine.StartPoint = new Point(0, lastUpY);
+        CurrentUploadLine.EndPoint = new Point(width, lastUpY);
 
         CurrentUploadText.Text = _viewModel.CurrentUploadText;
         Canvas.SetTop(CurrentUploadText, lastUpY - 16);
         Canvas.SetLeft(CurrentUploadText, (width / 2) - 25);
     }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    private void CloseButton_Click(object? sender, RoutedEventArgs e)
     {
         this.Close();
     }
 
-    private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void Window_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        this.DragMove();
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            BeginMoveDrag(e);
     }
 }

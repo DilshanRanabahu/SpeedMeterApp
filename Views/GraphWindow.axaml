@@ -1,9 +1,11 @@
-<Window x:Class="SpeedMeterApp.Views.GraphWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SpeedMeterApp.ViewModels"
+        x:DataType="vm:GraphViewModel"
+        x:Class="SpeedMeterApp.Views.GraphWindow"
         Title="Network Graph" Height="300" Width="500"
-        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+        SystemDecorations="None" Background="Transparent" TransparencyLevelHint="Transparent"
+        PointerPressed="Window_PointerPressed">
     
     <Border Background="#121212" CornerRadius="10" BorderBrush="#333333" BorderThickness="1">
         <Grid Margin="15">
@@ -55,17 +57,17 @@
                 <Border Grid.Column="1" BorderBrush="#333333" BorderThickness="0,0,0,1" Background="#1A1A1A">
                     <Canvas x:Name="GraphCanvas" SizeChanged="GraphCanvas_SizeChanged" ClipToBounds="True">
                         <!-- Horizontal Grid Lines -->
-                        <Line x:Name="GridLine75" Stroke="#2A2A2A" StrokeDashArray="2 2" X1="0" Y1="0" X2="1000" Y2="0"/>
-                        <Line x:Name="GridLine50" Stroke="#2A2A2A" StrokeDashArray="2 2" X1="0" Y1="0" X2="1000" Y2="0"/>
-                        <Line x:Name="GridLine25" Stroke="#2A2A2A" StrokeDashArray="2 2" X1="0" Y1="0" X2="1000" Y2="0"/>
+                        <Line x:Name="GridLine75" Stroke="#2A2A2A" StrokeDashArray="2,2" StartPoint="0,0" EndPoint="1000,0"/>
+                        <Line x:Name="GridLine50" Stroke="#2A2A2A" StrokeDashArray="2,2" StartPoint="0,0" EndPoint="1000,0"/>
+                        <Line x:Name="GridLine25" Stroke="#2A2A2A" StrokeDashArray="2,2" StartPoint="0,0" EndPoint="1000,0"/>
                         
                         <!-- Data Lines -->
-                        <Polyline x:Name="UploadLine" Stroke="#4CAF50" StrokeThickness="2" StrokeLineJoin="Round"/>
-                        <Polyline x:Name="DownloadLine" Stroke="#2196F3" StrokeThickness="2" StrokeLineJoin="Round"/>
+                        <Polyline x:Name="UploadLine" Stroke="#4CAF50" StrokeThickness="2" StrokeJoin="Round"/>
+                        <Polyline x:Name="DownloadLine" Stroke="#2196F3" StrokeThickness="2" StrokeJoin="Round"/>
                         
                         <!-- Current Value Projection Lines -->
-                        <Line x:Name="CurrentUploadLine" Stroke="#4CAF50" StrokeDashArray="4 4" Opacity="0.5" X1="0" Y1="0" X2="0" Y2="0"/>
-                        <Line x:Name="CurrentDownloadLine" Stroke="#2196F3" StrokeDashArray="4 4" Opacity="0.5" X1="0" Y1="0" X2="0" Y2="0"/>
+                        <Line x:Name="CurrentUploadLine" Stroke="#4CAF50" StrokeDashArray="4,4" Opacity="0.5" StartPoint="0,0" EndPoint="0,0"/>
+                        <Line x:Name="CurrentDownloadLine" Stroke="#2196F3" StrokeDashArray="4,4" Opacity="0.5" StartPoint="0,0" EndPoint="0,0"/>
                         
                         <!-- Current Value Labels -->
                         <TextBlock x:Name="CurrentUploadText" Foreground="#4CAF50" FontSize="10" Background="#1A1A1A" Padding="2,0"/>

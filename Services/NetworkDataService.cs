@@ -1,5 +1,5 @@
 using System;
-using System.Windows.Threading;
+using Avalonia.Threading;
 using SpeedMeterApp.Models;
 
 namespace SpeedMeterApp.Services;
